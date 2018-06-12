@@ -2,21 +2,25 @@ package ydsun.mineseeker.models;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class Mines {
     private int mRowCount;
     private int mColCount;
     private int mMineCount;
     private int[] mScans;
+    private int mScanUsed;
 
     private boolean mMines[];
 
-    public Mines (int rowCount, int colCount, int mineCount) {
+    private Mines (int rowCount, int colCount, int mineCount) {
         mRowCount = rowCount;
         mColCount = colCount;
         mMineCount = mineCount;
         mMines = new boolean[rowCount * colCount];
         mScans = new int[rowCount * colCount];
+        mScanUsed = 0;
 
         if (mMineCount > rowCount * colCount) {
             throw new IllegalArgumentException("mineCount cannot be more than rowCount*colCount");
@@ -26,11 +30,28 @@ public class Mines {
         for(int i = 0; i < mMineCount; i++) {
             mMines[i] = true;
         }
-        Collections.shuffle(Arrays.asList(mMines));
+
+        Random rnd = ThreadLocalRandom.current();
+        for (int i = mColCount * mRowCount - 1; i > 0; i--){
+            int index = rnd.nextInt(i + 1);
+            // Simple swap
+            boolean temp = mMines[index];
+            mMines[index] = mMines[i];
+            mMines[i] = temp;
+        }
 
         for(int i = 0; i < rowCount * colCount; i++){
             mScans[i] = 0;
         }
+    }
+
+    // Singleton support
+    private static Mines instance;
+    public static Mines getInstance(int row, int col, int mines){
+        if (instance == null){
+            instance = new Mines(row, col, mines);
+        }
+        return new Mines(row, col, mines);
     }
 
     public int getRowCount(){
@@ -45,6 +66,39 @@ public class Mines {
         return this.mMineCount;
     }
 
+    public int getScanCount(){
+        return this.mScanUsed;
+    }
+
+    public boolean getIndexStatus(int index){
+        if(index < 0 || index > this.mColCount * this.mRowCount){
+            throw new IllegalArgumentException("bad index!");
+        }
+        return this.mMines[index];
+    }
+
+    public void placeMine(int index){
+        if(index < 0 || index > this.mColCount * this.mRowCount){
+            throw new IllegalArgumentException("bad index!");
+        }
+        else if(!this.mMines[index]){
+            this.mMines[index] = true;
+            this.mMineCount++;
+            this.scanMines();
+        }
+    }
+
+    public void removeMine(int index){
+        if(index < 0 || index > this.mColCount * this.mRowCount){
+            throw new IllegalArgumentException("bad index!");
+        }
+        else if(this.mMines[index]){
+            this.mMines[index] = false;
+            this.mMineCount--;
+            this.scanMines();
+        }
+    }
+
     public void setRowCount(int row){
         if(row <= 0){
             throw new IllegalArgumentException("row count must be greater than 0!");
@@ -54,7 +108,7 @@ public class Mines {
         }
     }
 
-    public void settColCount(int col){
+    public void setColCount(int col){
         if(col <= 0){
             throw new IllegalArgumentException("column count must be greater than 0!");
         }
@@ -72,6 +126,11 @@ public class Mines {
         }
     }
 
+    private void newScan(){
+            this.mScanUsed ++;
+    }
+
+    // how to scan mines
     private int scan(int index){
         int count_mines = 0;
         int row_pos = index%this.mColCount;
@@ -88,17 +147,37 @@ public class Mines {
         return count_mines;
     }
 
+    // scanned all the mines' row and col mine count
     public void scanMines(){
         for(int i = 0; i < this.mRowCount * this.mColCount; i++){
             this.mScans[i] = scan(i);
         }
     }
 
-    public int getScannedMineCount(int index){
+    // return the mine's row and col mine count at given index
+    public int getScannedMineCRCount(int index){
         if(index < 0 || index > this.mColCount * this.mRowCount){
             throw new IllegalArgumentException("bad index!");
         }
         else {
+            return this.mScans[index];
+        }
+    }
+
+    // what happens if a mine is clicked
+    public int click_mines(int index){
+        if(index < 0 || index > this.mColCount * this.mRowCount){
+            throw new IllegalArgumentException("bad index!");
+        }
+        else if(this.mMines[index]){
+            mMines[index] = false;
+            this.mMineCount --;
+            this.scanMines();
+            return 999999999;
+        }
+        else {
+            this.newScan();
+            this.scanMines();
             return this.mScans[index];
         }
     }
