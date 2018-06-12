@@ -6,12 +6,14 @@ import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Mines {
+    private static final int EXIST_MINE = 999727999;
+    private static final int ALREADY_SCANNED = 100030001;
     private int mRowCount;
     private int mColCount;
     private int mMineCount;
     private int[] mScans;
     private int mScanUsed;
-
+    private boolean mIfScanned[];
     private boolean mMines[];
 
     private Mines (int rowCount, int colCount, int mineCount) {
@@ -19,6 +21,7 @@ public class Mines {
         mColCount = colCount;
         mMineCount = mineCount;
         mMines = new boolean[rowCount * colCount];
+        mIfScanned = new boolean[rowCount * colCount];
         mScans = new int[rowCount * colCount];
         mScanUsed = 0;
 
@@ -42,6 +45,10 @@ public class Mines {
 
         for(int i = 0; i < rowCount * colCount; i++){
             mScans[i] = 0;
+        }
+
+        for(int i = 0; i < rowCount * colCount; i++){
+            mIfScanned[i] = false;
         }
     }
 
@@ -70,6 +77,23 @@ public class Mines {
         return this.mScanUsed;
     }
 
+    public int msg_already_scanned(){
+        return ALREADY_SCANNED;
+    }
+
+    public int msg_found_mine(){
+        return EXIST_MINE;
+    }
+
+    // check if a position used a scan or not
+    public boolean checkIfScanned(int index){
+        if(index < 0 || index > this.mColCount * this.mRowCount){
+            throw new IllegalArgumentException("bad index!");
+        }
+        return this.mIfScanned[index];
+    }
+
+    // check if a position has a mine or not
     public boolean getIndexStatus(int index){
         if(index < 0 || index > this.mColCount * this.mRowCount){
             throw new IllegalArgumentException("bad index!");
@@ -77,6 +101,7 @@ public class Mines {
         return this.mMines[index];
     }
 
+    // place a mine in the given index if one does not already exist *for testing only*
     public void placeMine(int index){
         if(index < 0 || index > this.mColCount * this.mRowCount){
             throw new IllegalArgumentException("bad index!");
@@ -88,6 +113,7 @@ public class Mines {
         }
     }
 
+    // removing a mine in the given index if one exists *for testing only*
     public void removeMine(int index){
         if(index < 0 || index > this.mColCount * this.mRowCount){
             throw new IllegalArgumentException("bad index!");
@@ -99,6 +125,7 @@ public class Mines {
         }
     }
 
+    // change the row count *not so useful*
     public void setRowCount(int row){
         if(row <= 0){
             throw new IllegalArgumentException("row count must be greater than 0!");
@@ -108,6 +135,7 @@ public class Mines {
         }
     }
 
+    // change the col count *not so useful*
     public void setColCount(int col){
         if(col <= 0){
             throw new IllegalArgumentException("column count must be greater than 0!");
@@ -117,6 +145,7 @@ public class Mines {
         }
     }
 
+    // set mine count *not so useful*
     public void setMineCount(int mine){
         if(mine <= 0 || mine > this.mRowCount * this.mColCount){
             throw new IllegalArgumentException("not a valid mine count!");
@@ -126,6 +155,7 @@ public class Mines {
         }
     }
 
+    // increment total scan used
     private void newScan(){
             this.mScanUsed ++;
     }
@@ -173,12 +203,18 @@ public class Mines {
             mMines[index] = false;
             this.mMineCount --;
             this.scanMines();
-            return 999999999;
+            return this.msg_found_mine();
         }
         else {
-            this.newScan();
-            this.scanMines();
-            return this.mScans[index];
+            if(!mIfScanned[index]) {
+                this.newScan();
+                this.scanMines();
+                mIfScanned[index] = true;
+                return this.mScans[index];
+            }
+            else{
+                return this.msg_already_scanned();
+            }
         }
     }
 }
