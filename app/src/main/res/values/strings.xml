@@ -9,6 +9,8 @@
     <string name="ok">OK</string>
     <string name="congratulations_you_win">Congratulations! You Win!</string>
     <string name="game_over">GAME OVER</string>
+    <string name="textview">TextView</string>
+    <string name="sampletext">SampleText</string>
     <string-array name="board_sizes">
         <item>4 x 6</item>
         <item>5 x 10</item>
