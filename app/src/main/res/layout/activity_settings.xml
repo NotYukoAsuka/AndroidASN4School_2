@@ -6,4 +6,49 @@
     android:layout_height="match_parent"
     tools:context=".activities.Settings">
 
+    <TextView
+        android:id="@+id/msg_mine_amount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="73dp"
+        android:layout_marginStart="94dp"
+        android:layout_marginTop="25dp"
+        android:text="@string/mines"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toStartOf="@+id/mine_amount"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/msg_select_board_size" />
+
+    <Spinner
+        android:id="@+id/mine_amount"
+        android:layout_width="0dp"
+        android:layout_height="28dp"
+        android:layout_marginEnd="230dp"
+        android:layout_marginTop="22dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/msg_mine_amount"
+        app:layout_constraintTop_toBottomOf="@+id/board_size" />
+
+    <Spinner
+        android:id="@+id/board_size"
+        android:layout_width="0dp"
+        android:layout_height="28dp"
+        android:layout_marginEnd="230dp"
+        android:layout_marginTop="41dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/msg_select_board_size"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/msg_select_board_size"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="73dp"
+        android:layout_marginStart="72dp"
+        android:layout_marginTop="44dp"
+        android:text="@string/board_size"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toStartOf="@+id/board_size"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 </android.support.constraint.ConstraintLayout>

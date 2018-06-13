@@ -6,17 +6,21 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
+import junit.framework.Assert;
+
 import ydsun.mineseeker.R;
-import ydsun.mineseeker.models.Mines;
+import ydsun.mineseeker.models.SettingsClass;
 
 public class MainMenu extends AppCompatActivity {
+
+    private SettingsClass my_settings;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_menu);
 
-        Mines my_game = Mines.getInstance(4,6,6);
+        my_settings = SettingsClass.sGetInstance();
 
         setupPlayButton();
         setupSettingButton();

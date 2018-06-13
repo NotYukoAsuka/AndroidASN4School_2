@@ -17,6 +17,11 @@ public class Mines {
     private boolean mMines[];
 
     private Mines (int rowCount, int colCount, int mineCount) {
+
+        if (mineCount > rowCount * colCount) {
+            throw new IllegalArgumentException("mineCount cannot be more than rowCount*colCount");
+        }
+
         mRowCount = rowCount;
         mColCount = colCount;
         mMineCount = mineCount;
@@ -25,20 +30,18 @@ public class Mines {
         mScans = new int[rowCount * colCount];
         mScanUsed = 0;
 
-        if (mMineCount > rowCount * colCount) {
-            throw new IllegalArgumentException("mineCount cannot be more than rowCount*colCount");
-        }
 
-        // TODO: randomly place `mineCount' mines in the array
         for(int i = 0; i < mMineCount; i++) {
             mMines[i] = true;
         }
 
-        Random rnd = ThreadLocalRandom.current();
+        int index;
+        boolean temp;
+        Random rnd = new Random();
         for (int i = mColCount * mRowCount - 1; i > 0; i--){
-            int index = rnd.nextInt(i + 1);
+            index = rnd.nextInt(i + 1);
             // Simple swap
-            boolean temp = mMines[index];
+            temp = mMines[index];
             mMines[index] = mMines[i];
             mMines[i] = temp;
         }
@@ -157,7 +160,9 @@ public class Mines {
 
     // increment total scan used
     private void newScan(){
-            this.mScanUsed ++;
+        if(this.getMineCount() != 0) {
+            this.mScanUsed++;
+        }
     }
 
     // how to scan mines
